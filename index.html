@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A static scoreboard tracking the complete 105 game series between FLEISCH and LoreOfHeavens. (ETC Rules, Standard 15 Army Books, All Matchups)">
+    <title>WHFB 8th Edition: LoH vs Fleisch</title>
+    <style>
+        /* --- BASIC SETUP --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* --- LAYOUT CONTAINERS --- */
+        .main-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            gap: 20px;
+            position: relative;
+        }
+
+        .match-column {
+            flex: 2;
+        }
+
+        .score-column {
+            flex: 1;
+        }
+
+        /* --- STICKY SCOREBOARD (RIGHT SIDE) --- */
+        .scoreboard {
+            position: sticky;
+            top: 20px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 10;
+        }
+
+        .scoreboard h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .scoreboard p {
+            font-size: 13px;
+            color: #777;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        
+        .vs-text {
+            font-size: 16px; 
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            margin-top: 20px;
+        }
+
+        .total-score-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 40px;
+            font-weight: bold;
+            padding: 10px 0;
+            border-top: 2px solid #eee;
+        }
+
+        /* --- COLORS --- */
+        .color-loh { color: #5bc0de; } 
+        .color-fleisch { color: #d9534f; }
+        .color-neutral { color: #ddd; } 
+        
+        /* --- MATCH TABLE STYLES --- */
+        .match-row {
+            display: flex;
+            background: white;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            min-height: 60px;
+        }
+
+        .side {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Left Side (LoH) */
+        .side.left {
+            justify-content: space-between; 
+            border-right: 1px solid #eee;
+        }
+
+        /* Right Side (Fleisch) */
+        .side.right {
+            justify-content: space-between; 
+            flex-direction: row-reverse; 
+        }
+
+        .score-num {
+            font-size: 24px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .faction-name {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333; 
+        }
+
+        /* --- WINNER LOGIC --- */
+        .winner-loh { background-color: rgba(91, 192, 222, 0.3); } 
+        .winner-fleisch { background-color: rgba(217, 83, 79, 0.3); } 
+        
+        .tie { background-color: #f9f9f9; }
+
+        /* --- MOBILE OPTIMIZATION --- */
+        @media (max-width: 768px) {
+            .main-container { 
+                flex-direction: column-reverse; 
+                padding: 10px; 
+            }
+
+            .scoreboard { 
+                position: relative; 
+                top: 0; 
+                margin-bottom: 20px; 
+                padding: 20px; 
+            }
+
+            .total-score-box { font-size: 32px; }
+            .faction-name { font-size: 14px; }
+            .score-num { font-size: 20px; min-width: 30px; }
+            .side { padding: 10px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <div class="match-column" id="match-list">
+            </div>
+
+        <div class="score-column">
+            <div class="scoreboard">
+                <h1>Matchup Tracker</h1>
+                
+                <div class="vs-text">
+                    <span class="color-loh">LoreOfHeavens</span> vs <span class="color-fleisch">FLEISCH</span>
+                </div>
+                
+                <div class="total-score-box">
+                    <span id="loh-total" class="color-loh">0</span>
+                    <span style="font-size: 16px; color:#ccc;">TOTAL</span>
+                    <span id="fleisch-total" class="color-fleisch">0</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ======================================================
+        // DATA SECTION
+        // ======================================================
+        // USE 'null' FOR UNPLAYED GAMES.
+        // USE numbers (0-20) only when the game is finished.
+        
+        const games = [
+            // --- BEASTMEN VS ... ---
+            { loh: "Beastmen", fleisch: "Bretonnia", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Daemons of Chaos", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Dark Elves", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Dwarfs", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "High Elves", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Lizardmen", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Ogre Kingdoms", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Orcs & Goblins", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Beastmen", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- BRETONNIA VS ... ---
+            { loh: "Bretonnia", fleisch: "Daemons of Chaos", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Dark Elves", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Dwarfs", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "High Elves", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Lizardmen", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Ogre Kingdoms", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Orcs & Goblins", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Bretonnia", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- DAEMONS OF CHAOS VS ... ---
+            { loh: "Daemons of Chaos", fleisch: "Dark Elves", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Dwarfs", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "High Elves", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Lizardmen", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Ogre Kingdoms", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Orcs & Goblins", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Daemons of Chaos", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- DARK ELVES VS ... ---
+            { loh: "Dark Elves", fleisch: "Dwarfs", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "High Elves", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "Lizardmen", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "Ogre Kingdoms", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "Orcs & Goblins", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Dark Elves", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- DWARFS VS ... ---
+            { loh: "Dwarfs", fleisch: "High Elves", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "Lizardmen", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "Ogre Kingdoms", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "Orcs & Goblins", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Dwarfs", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- HIGH ELVES VS ... ---
+            { loh: "High Elves", fleisch: "Lizardmen", s1: null, s2: null },
+            { loh: "High Elves", fleisch: "Ogre Kingdoms", s1: null, s2: null },
+            { loh: "High Elves", fleisch: "Orcs & Goblins", s1: null, s2: null },
+            { loh: "High Elves", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "High Elves", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "High Elves", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "High Elves", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "High Elves", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "High Elves", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- LIZARDMEN VS ... ---
+            { loh: "Lizardmen", fleisch: "Ogre Kingdoms", s1: null, s2: null },
+            { loh: "Lizardmen", fleisch: "Orcs & Goblins", s1: null, s2: null },
+            { loh: "Lizardmen", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "Lizardmen", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Lizardmen", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Lizardmen", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Lizardmen", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Lizardmen", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- OGRE KINGDOMS VS ... ---
+            { loh: "Ogre Kingdoms", fleisch: "Orcs & Goblins", s1: null, s2: null },
+            { loh: "Ogre Kingdoms", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "Ogre Kingdoms", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Ogre Kingdoms", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Ogre Kingdoms", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Ogre Kingdoms", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Ogre Kingdoms", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- ORCS & GOBLINS VS ... ---
+            { loh: "Orcs & Goblins", fleisch: "Skaven", s1: null, s2: null },
+            { loh: "Orcs & Goblins", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Orcs & Goblins", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Orcs & Goblins", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Orcs & Goblins", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Orcs & Goblins", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- SKAVEN VS ... ---
+            { loh: "Skaven", fleisch: "The Empire", s1: null, s2: null },
+            { loh: "Skaven", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "Skaven", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Skaven", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Skaven", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- THE EMPIRE VS ... ---
+            { loh: "The Empire", fleisch: "Tomb Kings", s1: null, s2: null },
+            { loh: "The Empire", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "The Empire", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "The Empire", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- TOMB KINGS VS ... ---
+            { loh: "Tomb Kings", fleisch: "Vampire Counts", s1: null, s2: null },
+            { loh: "Tomb Kings", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Tomb Kings", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- VAMPIRE COUNTS VS ... ---
+            { loh: "Vampire Counts", fleisch: "Warriors of Chaos", s1: null, s2: null },
+            { loh: "Vampire Counts", fleisch: "Wood Elves", s1: null, s2: null },
+
+            // --- WARRIORS OF CHAOS VS ... ---
+            { loh: "Warriors of Chaos", fleisch: "Wood Elves", s1: null, s2: null },
+        ];
+
+        // ======================================================
+        // LOGIC SECTION
+        // ======================================================
+
+        const matchList = document.getElementById('match-list');
+        const lohTotalEl = document.getElementById('loh-total');
+        const fleischTotalEl = document.getElementById('fleisch-total');
+
+        let lohSum = 0;
+        let fleischSum = 0;
+
+        games.forEach(game => {
+            let s1Display = "";
+            let s2Display = "";
+            let leftClass = "";
+            let rightClass = "";
+            let s1Color = "color-neutral";
+            let s2Color = "color-neutral";
+
+            if (game.s1 !== null && game.s2 !== null) {
+                // Game is played!
+                s1Display = game.s1;
+                s2Display = game.s2;
+                s1Color = "color-loh";
+                s2Color = "color-fleisch";
+
+                // Update Totals
+                lohSum += game.s1;
+                fleischSum += game.s2;
+
+                // Determine Winner Logic
+                if (game.s1 > game.s2) {
+                    leftClass = "winner-loh";
+                    // No style for loser
+                } else if (game.s2 > game.s1) {
+                    rightClass = "winner-fleisch";
+                    // No style for loser
+                } else {
+                    leftClass = "tie";
+                    rightClass = "tie";
+                }
+            } 
+            // If game is null, variables remain empty/neutral
+
+            // Create HTML structure
+            const row = document.createElement('div');
+            row.className = 'match-row';
+            
+            row.innerHTML = `
+                <div class="side left ${leftClass}">
+                    <span class="score-num ${s1Color}">${s1Display}</span>
+                    <span class="faction-name">${game.loh}</span>
+                </div>
+                <div class="side right ${rightClass}">
+                    <span class="score-num ${s2Color}">${s2Display}</span>
+                    <span class="faction-name">${game.fleisch}</span>
+                </div>
+            `;
+
+            matchList.appendChild(row);
+        });
+
+        // Display Totals
+        lohTotalEl.innerText = lohSum;
+        fleischTotalEl.innerText = fleischSum;
+    </script>
+</body>
+</html>
