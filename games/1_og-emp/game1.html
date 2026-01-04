@@ -54,6 +54,52 @@
             margin-top: -15px;
             margin-bottom: 25px;
         }
+
+        details {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px; 
+            overflow: hidden;
+        }
+
+        details:last-of-type {
+            margin-bottom: 30px; 
+        }
+
+        summary {
+            background: #eee;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #444;
+            list-style: none; 
+            outline: none;
+        }
+
+        summary::after {
+            content: '+'; 
+            float: right;
+            font-weight: bold;
+        }
+        
+        details[open] summary::after {
+            content: '-';
+        }
+
+        .list-content {
+            padding: 15px;
+            font-size: 14px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+        }
+
+        pre {
+            white-space: pre-wrap; 
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            margin: 0;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -63,6 +109,139 @@
 
         <h1>Orcs & Goblins - The Empire</h1>
         <div class="score-line">LoH (11) - Fleisch (9)</div>
+
+        <details>
+            <summary>Orcs & Goblins</summary>
+            <div class="list-content">
+<pre>
++ Lords +
+
+Black Orc Warboss [253pts]: Shield
+. Magic Items: BRB - Crown of Command, BRB - Dragonhelm, BRB - Talisman of Preservation
+
+Savage Orc Great Shaman [300pts]: Lore of da Big Waaagh!, Wizard Level 4
+. Magic Items: AB - Lucky Shrunken Head (Savage Orc Shaman or Great Shaman only), BRB - Obsidian Lodestone
+
++ Heroes +
+
+Goblin Big Boss [53pts]: Light Armour, Shield, Short Bow
+. Giant Wolf
+
+Goblin Big Boss [53pts]: Light Armour, Shield, Short Bow
+. Giant Wolf
+
+Goblin Big Boss [53pts]: Light Armour, Shield, Short Bow
+. Giant Wolf
+
+Savage Orc Big Boss [121pts]: Great Weapon, Shield
+. Battle Standard Bearer: BRB - Standard of Discipline
+
+Savage Orc Shaman [95pts]: Lore of da Big Waaagh!, Wizard Level 1
+. Magic Items: BRB - Dispel Scroll
+
++ Core +
+
+Night Goblins [270pts]: Boss, Musician, Netters, 3x Night Goblin Fanatics, Standard Bearer
+. 40x Night Goblin: 40x Hand Weapons and Shields
+
+Savage Orc Big 'Uns [431pts]: Boss, Musician, Standard Bearer
+. 36x Savage Orc Big 'Un: 36x Additional Hand Weapon
+
++ Special +
+
+Orc Boar Chariot [90pts]: One extra Orc Crew
+
+Trolls [420pts]: 12x Troll
+
++ Rare +
+
+Doom Diver Catapult [80pts]
+
+Doom Diver Catapult [80pts]
+
+Goblin Rock Lobber [85pts]
+
+Goblin Rock Lobber [85pts]
+
+Mangler Squigs [65pts]
+
+Mangler Squigs [65pts]
+
+++ Total: [2,599pts] ++
+
+Created with BattleScribe
+
+</pre>
+            </div>
+        </details>
+
+        <details>
+            <summary>The Empire</summary>
+            <div class="list-content">
+<pre>
++ Lords +
+
+
+Battle Wizard Lord [288pts]: Lore of Heavens, Wizard Level 4
+
+. Magic Items: BRB - Dispel Scroll, BRB - Obsidian Lodestone
+. Warhorse
+
+Grand Master [255pts]
+
+. Magic Items: AB - Runefang, BRB - Charmed Shield, BRB - Luckstone, BRB - Potion of Speed
+
++ Heroes +
+
+
+Captain of the Empire [166pts]: Battle Standard Bearer, Full Plate Armour, Lance, Shield
+
+. Magic Items: AB - The White Cloak of Ulric
+. Warhorse: Barding
+
++ Core +
+
+
+Knightly Orders [110pts]: 5x Knightly Orders, Lance and Shield
+
+Knightly Orders [110pts]: 5x Knightly Orders, Lance and Shield
+
+Knightly Orders Inner Circle [440pts]: 15x Knightly Orders Inner Circle, Lance and Shield
+
+. Champion
+. Musician
+. Standard Bearer: AB - Steel Standard
+
++ Special +
+
+
+Demigryph Knights [257pts]: 4x Inner Circle Knight, Lance
+
+. Musician
+. Standard Bearer: BRB - Gleaming Pennant
+
+Demigryph Knights [262pts]: 4x Inner Circle Knight, Lance
+
+. Musician
+. Standard Bearer: BRB - Banner of Eternal Flame
+
+Great Cannon [120pts]
+
+Great Cannon [120pts]
+
++ Rare +
+
+
+Helblaster Volley Gun [120pts]
+
+Steam Tank [250pts]
+
+++ Total: [2,498pts] ++
+
+Created with BattleScribe
+</pre>
+            </div>
+        </details>
 
         <img src="0_deployment.png" class="battle-img">
         <div class="caption">Deployment</div>
@@ -128,6 +307,7 @@
         <div class="caption">Turn 6 FLEISCH</div>
 
         <p> Chain lighting kills wolfrider, charge kills rock lobber. </p>
+
     </div>
 
 </body>
