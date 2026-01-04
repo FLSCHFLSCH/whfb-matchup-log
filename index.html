@@ -190,7 +190,7 @@
         
         const games = [
             // --- PLAYED ---
-            { loh: "Orcs & Goblins", fleisch: "The Empire", s1: 11, s2: 9 },
+            { loh: "Orcs & Goblins", fleisch: "The Empire", s1: 11, s2: 9, report: "games/1_og-emp/game1.html"},
             
             // --- BEASTMEN VS ... ---
             { loh: "Beastmen", fleisch: "Bretonnia", s1: null, s2: null },
@@ -387,6 +387,23 @@
             matchList.appendChild(row);
         });
 
+        // Create Link to report
+        if (game.report) {
+                const link = document.createElement('a');
+                link.href = game.report;
+                link.className = 'match-row';
+                link.style.textDecoration = 'none';
+                link.style.color = 'inherit';
+                link.innerHTML = contentHtml;
+                matchList.appendChild(link);
+            } else {
+                const row = document.createElement('div');
+                row.className = 'match-row';
+                row.innerHTML = contentHtml;
+                matchList.appendChild(row);
+            }
+        });
+
         // Display Totals
         lohTotalEl.innerText = lohSum;
         fleischTotalEl.innerText = fleischSum;
@@ -394,3 +411,4 @@
 </body>
 
 </html>
+
