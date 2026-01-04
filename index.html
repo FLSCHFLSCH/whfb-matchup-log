@@ -351,29 +351,20 @@
                 s1Color = "color-loh";
                 s2Color = "color-fleisch";
 
-                // Update Totals
                 lohSum += game.s1;
                 fleischSum += game.s2;
 
-                // Determine Winner Logic
                 if (game.s1 > game.s2) {
                     leftClass = "winner-loh";
-                    // No style for loser
                 } else if (game.s2 > game.s1) {
                     rightClass = "winner-fleisch";
-                    // No style for loser
                 } else {
                     leftClass = "tie";
                     rightClass = "tie";
                 }
             } 
-            // If game is null, variables remain empty/neutral
 
-            // Create HTML structure
-            const row = document.createElement('div');
-            row.className = 'match-row';
-            
-            row.innerHTML = `
+            const contentHtml = `
                 <div class="side left ${leftClass}">
                     <span class="score-num ${s1Color}">${s1Display}</span>
                     <span class="faction-name">${game.loh}</span>
@@ -384,11 +375,7 @@
                 </div>
             `;
 
-            matchList.appendChild(row);
-        });
-
-        // Create Link to report
-        if (game.report) {
+            if (game.report) {
                 const link = document.createElement('a');
                 link.href = game.report;
                 link.className = 'match-row';
@@ -404,11 +391,11 @@
             }
         });
 
-        // Display Totals
         lohTotalEl.innerText = lohSum;
         fleischTotalEl.innerText = fleischSum;
     </script>
 </body>
 
 </html>
+
 
